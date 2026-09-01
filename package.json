@@ -1,12 +1,7 @@
 {
-  "name": "enumgenie-functions",
-  "description": "Firebase Cloud Functions for EnumGenie 2027",
-  "dependencies": {
-    "firebase-admin": "^12.0.0",
-    "firebase-functions": "^4.5.0"
-  },
-  "engines": {
-    "node": "18"
-  },
-  "main": "index.js"
+  "name": "enumgenie-2027",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "echo 'Static HTML project - No build required'"
+  }
 }
