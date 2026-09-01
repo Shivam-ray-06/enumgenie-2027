@@ -1,0 +1,51 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // SECURITY INJECTION: ABSOLUTELY NO catch-all rules. Deny by default.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Strict Enumeration Data Rules
+    match /enumerations/{enumId} {
+      
+      // Admins can read (Requires strict auth token claim validation)
+      allow read: if request.auth != null && request.auth.token.role == 'admin';
+      
+      // SECURITY INJECTION: Strict Schema Validation & Authentication Requirement
+      allow create: if request.auth != null 
+                    
+                    // Core payload structure validation
+                    && request.resource.data.keys().hasAll(['headName', 'householdSize', 'respondentAge', 'secureHash', 'timestamp', 'aadhaar_masked'])
+                    && request.resource.data.keys().hasOnly(['headName', 'householdSize', 'respondentAge', 'secureHash', 'timestamp', 'aadhaar_masked', 'maritalStatus', 'education', 'occupation'])
+                    
+                    // Type & Bounds Validation
+                    && request.resource.data.headName is string
+                    && request.resource.data.headName.size() >= 2
+                    && request.resource.data.headName.size() <= 100
+                    && request.resource.data.headName.matches("^[a-zA-Z\\s\\-'.]+$") // No script tags allowed in DB
+                    
+                    && request.resource.data.householdSize is int
+                    && request.resource.data.householdSize >= 1
+                    && request.resource.data.householdSize <= 50
+                    
+                    && request.resource.data.respondentAge is int
+                    && request.resource.data.respondentAge >= 18
+                    && request.resource.data.respondentAge <= 120
+                    
+                    && request.resource.data.secureHash is string
+                    && request.resource.data.secureHash.size() == 64 // Strict SHA-256 length check
+                    
+                    && request.resource.data.timestamp is timestamp
+                    
+                    // Validate that the sensitive PII has been hashed by the client
+                    && request.resource.data.aadhaar_masked is string
+                    && request.resource.data.aadhaar_masked.size() == 64; 
+                    
+      // SECURITY INJECTION: Prevent tampering. Enumeration records are immutable.
+      allow update: if false;
+      allow delete: if false;
+    }
+  }
+}

@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="app_title">EnumGenie 2027 | Digital Enumeration</title>
+    <meta name="description" content="Secure, fast, and accessible digital enumeration platform for Census 2027.">
+    <meta name="theme-color" content="#4f46e5">
+    
+    <!-- SECURITY INJECTION: Strict Content Security Policy (CSP) & Clickjacking prevention -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://unpkg.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests;">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    
+    <link rel="manifest" href="/manifest.json">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            indigo: '#4F46E5',
+                            emerald: '#10B981',
+                            slate: '#0f172a',
+                            light: '#f8fafc'
+                        }
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="/css/styles.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Chart.js for advanced analytics in Admin Portal -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 min-h-screen font-sans transition-colors duration-500 antialiased selection:bg-brand-indigo selection:text-white relative overflow-x-hidden">
+
+    <!-- Particle Background Container -->
+    <div id="particles-js" class="fixed inset-0 z-0 pointer-events-none opacity-30 dark:opacity-20 transition-opacity duration-500"></div>
+
+    <!-- Header Navigation -->
+    <header class="fixed w-full top-0 z-50 glass-panel border-b border-white/10 dark:border-slate-800/50 backdrop-blur-xl" role="banner">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Custom Civic-Tech Tricolor Logo -->
+                <div class="flex items-center space-x-3 group cursor-pointer hover:scale-105 transition-transform duration-300" aria-label="EnumGenie Home" tabindex="0">
+                    <div class="logo-container">
+                        <svg class="w-10 h-10 logo-svg drop-shadow-md" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <linearGradient id="flagSaffron" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" stop-color="#FF9933" />
+                                    <stop offset="100%" stop-color="#FF7700" />
+                                </linearGradient>
+                                <linearGradient id="flagGreen" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" stop-color="#138808" />
+                                    <stop offset="100%" stop-color="#10B981" />
+                                </linearGradient>
+                            </defs>
+                            <!-- Abstract India Map Contour Silhouette with Tricolor Motifs -->
+                            <path d="M45 10 C50 5 60 8 62 18 C65 25 70 30 75 35 C82 42 85 50 78 60 C72 68 68 75 60 85 C55 92 48 95 45 88 C40 80 35 70 30 65 C25 60 15 50 20 40 C24 30 32 25 38 20 Z" fill="url(#flagSaffron)" fill-opacity="0.25" stroke="#FF9933" stroke-width="2"/>
+                            <!-- Citizen Silhouette Accent -->
+                            <circle cx="48" cy="36" r="8" fill="#4F46E5"/>
+                            <path d="M36 54 C36 44 60 44 60 54 L60 62 L36 62 Z" fill="url(#flagGreen)" opacity="0.9"/>
+                            <!-- Digital Shield Wave -->
+                            <path d="M25 75 Q 48 90 75 75" stroke="#10B981" stroke-width="3" fill="none" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <span class="font-bold text-2xl tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-[#FF7700] via-brand-indigo to-[#138808]">
+                        EnumGenie <span class="font-light text-slate-700 dark:text-slate-200">2027</span>
+                    </span>
+                </div>
+
+                <!-- Controls: Language, Theme -->
+                <div class="flex items-center space-x-6">
+                    <!-- Global Search Bar for 36 States/UTs -->
+                    <div class="relative w-64 md:w-80 hidden lg:block">
+                        <div class="relative flex items-center">
+                            <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 pointer-events-none"></i>
+                            <input type="text" id="global-search-input" placeholder="Search 36 States/UTs or Districts..." class="w-full bg-white/20 dark:bg-slate-800/80 border border-slate-300/50 dark:border-slate-600/50 text-xs rounded-full py-2 pl-9 pr-4 backdrop-blur-md focus:outline-none focus:ring-2 focus:ring-brand-indigo transition-all">
+                        </div>
+                        <!-- Search Results Dropdown -->
+                        <div id="search-results-dropdown" class="hidden absolute top-full left-0 w-full mt-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-2xl overflow-hidden max-h-80 overflow-y-auto custom-scrollbar z-50">
+                        </div>
+                    </div>
+
+                    <!-- Network Badge -->
+                    <div id="network-badge" class="hidden md:flex items-center space-x-1.5 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-semibold backdrop-blur-md transition-colors">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <span data-i18n="network_online">Connected (Firebase Live)</span>
+                    </div>
+
+                    <!-- Language Dropdown -->
+                    <div class="relative group">
+                        <div class="absolute -inset-1 bg-gradient-to-r from-brand-indigo to-brand-emerald rounded-lg blur opacity-25 group-hover:opacity-75 transition duration-500"></div>
+                        <select id="language-selector" class="relative appearance-none bg-white/20 dark:bg-slate-800/80 border border-slate-300/50 dark:border-slate-600/50 text-sm font-medium rounded-lg focus:ring-2 focus:ring-brand-indigo block w-full py-2 pl-4 pr-10 backdrop-blur-md cursor-pointer transition-all hover:bg-white/30 dark:hover:bg-slate-700/80" aria-label="Select Language">
+                            <option value="en">English</option>
+                            <option value="hi">हिन्दी</option>
+                            <option value="ta">தமிழ்</option>
+                            <option value="mr">मराठी</option>
+                            <option value="te">తెలుగు</option>
+                            <option value="bn">বাংলা</option>
+                            <option value="gu">ગુજરાતી</option>
+                            <option value="kn">ಕನ್ನಡ</option>
+                            <option value="ml">മലയാളം</option>
+                            <option value="pa">ਪੰਜਾਬੀ</option>
+                            <option value="or">ଓଡ଼ିଆ</option>
+                            <option value="as">অসমীয়া</option>
+                            <option value="ur">اردو</option>
+                            <option value="sa">संस्कृत</option>
+                            <option value="ks">کأشُر</option>
+                            <option value="sd">سنڌي</option>
+                        </select>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-500 dark:text-slate-400">
+                            <i data-lucide="globe" class="w-4 h-4"></i>
+                        </div>
+                    </div>
+
+                    <!-- Theme Toggle -->
+                    <button id="theme-toggle" class="p-2.5 rounded-full hover:bg-slate-200/50 dark:hover:bg-slate-700/50 backdrop-blur-sm transition-all focus:outline-none focus:ring-2 focus:ring-brand-indigo hover:rotate-12 cursor-pointer" aria-label="Toggle Dark Mode" data-i18n-title="theme_toggle">
+                        <i data-lucide="moon" class="w-5 h-5 hidden dark:block text-brand-emerald"></i>
+                        <i data-lucide="sun" class="w-5 h-5 block dark:hidden text-brand-indigo"></i>
+                    </button>
+
+                    <!-- Top-Right Sign In / Profile Switcher Dropdown -->
+                    <div class="relative">
+                        <button id="btn-profile-dropdown" class="flex items-center space-x-2 px-3 py-1.5 rounded-full bg-brand-indigo/10 text-brand-indigo hover:bg-brand-indigo/20 border border-brand-indigo/20 transition-all text-xs font-bold shadow-sm">
+                            <i data-lucide="user-check" class="w-4 h-4"></i>
+                            <span id="current-profile-label">Sign In / Switch Role</span>
+                            <i data-lucide="chevron-down" class="w-3.5 h-3.5 ml-1"></i>
+                        </button>
+                        <div id="profile-dropdown-menu" class="hidden absolute right-0 mt-2 w-64 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-2xl overflow-hidden p-2 space-y-1 z-50">
+                            <div class="px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-wider text-slate-400">Select Demo Profile</div>
+                            <button class="demo-profile-btn w-full text-left p-2 rounded-xl hover:bg-brand-indigo/10 transition-colors flex items-center space-x-2" data-profile="admin">
+                                <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                                <div class="truncate">
+                                    <div class="font-bold text-xs text-brand-indigo">Admin Director</div>
+                                    <div class="text-[10px] text-slate-400 truncate">admin.census2027@gov.in</div>
+                                </div>
+                            </button>
+                            <button class="demo-profile-btn w-full text-left p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors flex items-center space-x-2" data-profile="citizen1">
+                                <span class="w-2 h-2 rounded-full bg-brand-indigo"></span>
+                                <div class="truncate">
+                                    <div class="font-bold text-xs">Rajesh (Delhi)</div>
+                                    <div class="text-[10px] text-slate-400 truncate">Head of Household</div>
+                                </div>
+                            </button>
+                            <button class="demo-profile-btn w-full text-left p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors flex items-center space-x-2" data-profile="citizen2">
+                                <span class="w-2 h-2 rounded-full bg-purple-500"></span>
+                                <div class="truncate">
+                                    <div class="font-bold text-xs">Priya (Chennai)</div>
+                                    <div class="text-[10px] text-slate-400 truncate">Joint Resident</div>
+                                </div>
+                            </button>
+                            <button class="demo-profile-btn w-full text-left p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors flex items-center space-x-2" data-profile="citizen3">
+                                <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+                                <div class="truncate">
+                                    <div class="font-bold text-xs">Amit (Pune)</div>
+                                    <div class="text-[10px] text-slate-400 truncate">Rural Inhabitant</div>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="pt-28 pb-16 px-4 sm:px-6 lg:px-8 max-w-[90rem] mx-auto flex-grow flex flex-col items-center justify-center min-h-screen relative z-10" role="main">
+        
+        <!-- ==================== AUTH VIEW ==================== -->
+        <section id="view-login" class="w-full max-w-lg animate-slide-up block">
+            <div class="glass-panel p-10 rounded-3xl shadow-2xl border border-white/20 relative overflow-hidden group hover:shadow-brand-indigo/10 transition-shadow duration-500">
+                <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-brand-indigo via-purple-500 to-brand-emerald"></div>
+                
+                <div class="text-center mb-10">
+                    <h1 class="text-4xl font-extrabold mb-3 tracking-tight" data-i18n="welcome_title">Welcome to EnumGenie</h1>
+                    <p class="text-slate-500 dark:text-slate-400 text-base" data-i18n="welcome_subtitle">Select your portal to securely access the 2027 Digital Census ecosystem.</p>
+                </div>
+                
+                <div class="space-y-5">
+                    <button id="btn-citizen" class="w-full relative group/btn flex items-center justify-between px-8 py-5 border border-brand-indigo/30 hover:border-brand-indigo bg-brand-indigo/5 hover:bg-brand-indigo/10 rounded-2xl transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-brand-indigo/30 overflow-hidden cursor-pointer">
+                        <div class="absolute inset-0 bg-gradient-to-r from-brand-indigo/0 via-brand-indigo/5 to-brand-indigo/0 translate-x-[-100%] group-hover/btn:translate-x-[100%] transition-transform duration-700 pointer-events-none"></div>
+                        <div class="flex items-center">
+                            <div class="bg-brand-indigo/20 p-3 rounded-xl mr-4 group-hover/btn:scale-110 transition-transform">
+                                <i data-lucide="user" class="w-7 h-7 text-brand-indigo"></i>
+                            </div>
+                            <div class="text-left">
+                                <span class="font-bold text-xl block" data-i18n="btn_citizen">Citizen Portal</span>
+                                <span class="text-xs text-slate-500 dark:text-slate-400" data-i18n="btn_citizen_sub">Self-enumeration & AI assistance</span>
+                            </div>
+                        </div>
+                        <i data-lucide="arrow-right" class="w-5 h-5 text-brand-indigo opacity-0 group-hover/btn:opacity-100 group-hover/btn:translate-x-1 transition-all"></i>
+                    </button>
+                    
+                    <button id="btn-admin" class="w-full relative group/btn flex items-center justify-between px-8 py-5 border border-brand-emerald/30 hover:border-brand-emerald bg-brand-emerald/5 hover:bg-brand-emerald/10 rounded-2xl transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-brand-emerald/30 overflow-hidden cursor-pointer">
+                        <div class="absolute inset-0 bg-gradient-to-r from-brand-emerald/0 via-brand-emerald/5 to-brand-emerald/0 translate-x-[-100%] group-hover/btn:translate-x-[100%] transition-transform duration-700 pointer-events-none"></div>
+                        <div class="flex items-center">
+                            <div class="bg-brand-emerald/20 p-3 rounded-xl mr-4 group-hover/btn:scale-110 transition-transform">
+                                <i data-lucide="shield-check" class="w-7 h-7 text-brand-emerald"></i>
+                            </div>
+                            <div class="text-left">
+                                <span class="font-bold text-xl block" data-i18n="btn_admin">Admin / Enumerator</span>
+                                <span class="text-xs text-slate-500 dark:text-slate-400" data-i18n="btn_admin_sub">Real-time analytics & verification</span>
+                            </div>
+                        </div>
+                        <i data-lucide="arrow-right" class="w-5 h-5 text-brand-emerald opacity-0 group-hover/btn:opacity-100 group-hover/btn:translate-x-1 transition-all"></i>
+                    </button>
+                </div>
+
+                <!-- Quick Demo Profile Selector -->
+                <div class="mt-8 pt-6 border-t border-slate-200 dark:border-slate-700/60">
+                    <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3 text-center">Judge Quick Demo Credentials</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                        <button class="demo-profile-btn text-left p-2.5 rounded-xl border border-brand-indigo/20 bg-brand-indigo/5 hover:bg-brand-indigo/15 transition-all flex items-center space-x-2" data-profile="admin">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                            <div class="truncate">
+                                <div class="font-bold text-brand-indigo">Admin Director</div>
+                                <div class="text-[10px] text-slate-400 truncate">admin.census2027@gov.in</div>
+                            </div>
+                        </button>
+                        <button class="demo-profile-btn text-left p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 transition-all flex items-center space-x-2" data-profile="citizen1">
+                            <span class="w-2 h-2 rounded-full bg-brand-indigo"></span>
+                            <div class="truncate">
+                                <div class="font-bold">Rajesh (Delhi)</div>
+                                <div class="text-[10px] text-slate-400 truncate">Head of Household</div>
+                            </div>
+                        </button>
+                        <button class="demo-profile-btn text-left p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 transition-all flex items-center space-x-2" data-profile="citizen2">
+                            <span class="w-2 h-2 rounded-full bg-purple-500"></span>
+                            <div class="truncate">
+                                <div class="font-bold">Priya (Chennai)</div>
+                                <div class="text-[10px] text-slate-400 truncate">Joint Resident</div>
+                            </div>
+                        </button>
+                        <button class="demo-profile-btn text-left p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 transition-all flex items-center space-x-2" data-profile="citizen3">
+                            <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+                            <div class="truncate">
+                                <div class="font-bold">Amit (Pune)</div>
+                                <div class="text-[10px] text-slate-400 truncate">Rural Inhabitant</div>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="mt-8 text-center">
+                    <p class="text-sm text-slate-400 flex items-center justify-center bg-slate-100 dark:bg-slate-800/50 py-2 rounded-full w-max mx-auto px-4 border border-slate-200 dark:border-slate-700">
+                        <i data-lucide="lock" class="w-4 h-4 mr-2 text-brand-emerald"></i> 
+                        <span data-i18n="encrypted_notice">End-to-end encrypted • Privacy Preserved</span>
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== CITIZEN PORTAL ==================== -->
+        <section id="view-citizen" class="w-full max-w-7xl animate-slide-up hidden">
+            <div class="flex justify-between items-end mb-8">
+                <div>
+                    <h2 class="text-3xl font-extrabold tracking-tight" data-i18n="citizen_portal_title">Citizen Enumeration Portal</h2>
+                    <p class="text-slate-500 mt-1" data-i18n="citizen_portal_sub">Complete your census securely or ask Census Mitra for help.</p>
+                </div>
+                <button class="btn-logout text-sm font-medium text-slate-500 hover:text-rose-500 transition-colors flex items-center bg-white/5 px-4 py-2 rounded-lg border border-white/10 hover:border-rose-500/50" data-i18n="btn_exit">
+                    <i data-lucide="log-out" class="w-4 h-4 mr-2"></i> Exit
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 h-[750px]">
+                
+                <!-- Self Enumeration Wizard Container (7 columns) -->
+                <div class="lg:col-span-7 glass-panel rounded-3xl border border-white/10 shadow-2xl flex flex-col h-full relative overflow-hidden">
+                    <div class="absolute inset-0 bg-gradient-to-br from-brand-indigo/5 to-transparent pointer-events-none"></div>
+                    
+                    <div class="px-8 py-6 border-b border-white/10 flex justify-between items-center bg-white/5 backdrop-blur-sm z-10">
+                        <h2 class="text-2xl font-bold flex items-center">
+                            <div class="bg-brand-indigo p-2 rounded-lg mr-3 shadow-lg shadow-brand-indigo/30">
+                                <i data-lucide="clipboard-list" class="w-6 h-6 text-white"></i>
+                            </div>
+                            <span data-i18n="wizard_title">Self-Enumeration Form</span>
+                        </h2>
+                        <button id="btn-audio-guide" class="group flex items-center space-x-2 px-4 py-2 rounded-full bg-brand-emerald/10 text-brand-emerald hover:bg-brand-emerald hover:text-white transition-all duration-300 border border-brand-emerald/30 shadow-sm" aria-label="Audio Guide">
+                            <i data-lucide="volume-2" class="w-5 h-5 group-hover:animate-pulse"></i>
+                            <span class="text-sm font-medium" data-i18n="btn_audio">Audio Guide</span>
+                        </button>
+                    </div>
+                    
+                    <div id="wizard-content" class="flex-grow overflow-y-auto px-8 py-6 custom-scrollbar relative z-10">
+                        <div id="wizard-loader" class="skeleton-loader h-full w-full rounded-xl absolute inset-0 z-20 hidden"></div>
+                        
+                        <form id="census-form" class="space-y-8 pb-10">
+                            <!-- Section 1: Demographics -->
+                            <div class="space-y-5 animate-slide-up" style="animation-delay: 0.1s;">
+                                <h3 class="text-lg font-semibold border-b border-slate-200 dark:border-slate-700 pb-2 text-brand-indigo" data-i18n="sec_basic">Basic Demographics</h3>
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div class="form-group">
+                                        <label class="block text-sm font-medium mb-1.5 text-slate-700 dark:text-slate-300" for="head-name" data-i18n="lbl_head_name">Head of Household Name</label>
+                                        <div class="relative">
+                                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                                                <i data-lucide="user" class="w-5 h-5"></i>
+                                            </div>
+                                            <input type="text" id="head-name" required class="w-full bg-white/50 dark:bg-slate-800/50 border border-slate-300 dark:border-slate-600 rounded-xl py-3 pl-10 pr-4 focus:ring-2 focus:ring-brand-indigo focus:border-brand-indigo transition-all shadow-sm backdrop-blur-sm" placeholder="Full legal name">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label class="block text-sm font-medium mb-1.5 text-slate-700 dark:text-slate-300" for="respondent-age" data-i18n="lbl_age">Respondent Age (18+)</label>
+                                        <div class="relative">
+                                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                                                <i data-lucide="calendar" class="w-5 h-5"></i>
+                                            </div>
+                                            <input type="number" id="respondent-age" min="18" max="120" required class="w-full bg-white/50 dark:bg-slate-800/50 border border-slate-300 dark:border-slate-600 rounded-xl py-3 pl-10 pr-4 focus:ring-2 focus:ring-brand-indigo focus:border-brand-indigo transition-all shadow-sm backdrop-blur-sm" placeholder="e.g., 35">
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                    <div class="form-group">
+                                        <label class="block text-sm font-medium mb-1.5 text-slate-700 dark:text-slate-300" for="household-size" data-i18n="lbl_size">Household Size</label>
+                                        <div class="relative">
+                                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                                                <i data-lucide="users" class="w-5 h-5"></i>
+                                            </div>
+                                            <input type="number" id="household-size" min="1" max="50" required class="w-full bg-white/50 dark:bg-slate-800/50 border border-slate-300 dark:border-slate-600 rounded-xl py-3 pl-10 pr-4 focus:ring-2 focus:ring-brand-indigo transition-all shadow-sm" placeholder="1-50">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group col-span-2">
+                                        <label class="block text-sm font-medium mb-1.5 text-slate-700 dark:text-slate-300" for="marital-status" data-i18n="lbl_marital">Marital Status</label>
+                                        <select id="marital-status" required class="w-full bg-white/50 dark:bg-slate-800/50 border border-slate-300 dark:border-slate-600 rounded-xl py-3 px-4 focus:ring-2 focus:ring-brand-indigo transition-all shadow-sm cursor-pointer appearance-none">
+                                            <option value="" disabled selected data-i18n="opt_select">Select status</option>
+                                            <option value="single" data-i18n="opt_single">Single / Never Married</option>
+                                            <option value="married" data-i18n="opt_married">Married</option>
+                                            <option value="widowed" data-i18n="opt_widowed">Widowed</option>
+                                            <option value="divorced" data-i18n="opt_divorced">Divorced / Separated</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Section 2: Socio-Economic -->
+                            <div class="space-y-5 animate-slide-up" style="animation-delay: 0.2s;">
+                                <h3 class="text-lg font-semibold border-b border-slate-200 dark:border-slate-700 pb-2 text-brand-emerald" data-i18n="sec_socio">Socio-Economic Data</h3>
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div class="form-group">
+                                        <label class="block text-sm font-medium mb-1.5 text-slate-700 dark:text-slate-300" for="education" data-i18n="lbl_edu">Highest Education Level</label>
+                                        <select id="education" required class="w-full bg-white/50 dark:bg-slate-800/50 border border-slate-300 dark:border-slate-600 rounded-xl py-3 px-4 focus:ring-2 focus:ring-brand-emerald transition-all shadow-sm appearance-none cursor-pointer">
+                                            <option value="" disabled selected data-i18n="opt_select">Select education</option>
+                                            <option value="none" data-i18n="opt_edu_none">No Formal Education</option>
+                                            <option value="primary" data-i18n="opt_edu_primary">Primary (Up to 5th)</option>
+                                            <option value="secondary" data-i18n="opt_edu_secondary">Secondary (Up to 10th)</option>
+                                            <option value="higher_secondary" data-i18n="opt_edu_higher">Higher Secondary (12th)</option>
+                                            <option value="graduate" data-i18n="opt_edu_grad">Graduate / Postgraduate</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label class="block text-sm font-medium mb-1.5 text-slate-700 dark:text-slate-300" for="occupation" data-i18n="lbl_occ">Primary Occupation</label>
+                                        <select id="occupation" required class="w-full bg-white/50 dark:bg-slate-800/50 border border-slate-300 dark:border-slate-600 rounded-xl py-3 px-4 focus:ring-2 focus:ring-brand-emerald transition-all shadow-sm appearance-none cursor-pointer">
+                                            <option value="" disabled selected data-i18n="opt_select">Select occupation</option>
+                                            <option value="agriculture" data-i18n="opt_occ_agri">Agriculture & Farming</option>
+                                            <option value="business" data-i18n="opt_occ_biz">Business / Self-employed</option>
+                                            <option value="salaried" data-i18n="opt_occ_salaried">Salaried Employee</option>
+                                            <option value="student" data-i18n="opt_occ_student">Student</option>
+                                            <option value="homemaker" data-i18n="opt_occ_home">Homemaker</option>
+                                            <option value="unemployed" data-i18n="opt_occ_unemp">Unemployed</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                            <!-- Housing & Asset Details (Expanded) -->
+                                    <div class="space-y-4">
+                                        <h3 class="text-lg font-semibold border-b border-slate-200 dark:border-slate-700 pb-2 text-purple-500">Housing & Asset Details</h3>
+                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div>
+                                                <label class="block text-sm font-medium mb-1.5 text-slate-700 dark:text-slate-300" for="ownership">Ownership Status</label>
+                                                <select id="ownership" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-purple-500 focus:outline-none">
+                                                    <option value="owned">Owned</option>
+                                                    <option value="rented">Rented</option>
+                                                    <option value="institutional">Institutional / Provided</option>
+                                                </select>
+                                            </div>
+                                            <div>
+                                                <label class="block text-sm font-medium mb-1.5 text-slate-700 dark:text-slate-300" for="rooms">Dwelling Rooms</label>
+                                                <input id="rooms" type="number" min="1" max="20" value="2" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-purple-500 focus:outline-none">
+                                            </div>
+                                            <div>
+                                                <label class="block text-sm font-medium mb-1.5 text-slate-700 dark:text-slate-300" for="fuel">Cooking Fuel</label>
+                                                <select id="fuel" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-purple-500 focus:outline-none">
+                                                    <option value="lpg">LPG / PNG Connection</option>
+                                                    <option value="electricity">Electricity / Solar</option>
+                                                    <option value="biogas">Biogas / Firewood</option>
+                                                </select>
+                                            </div>
+                                            <div>
+                                                <label class="block text-sm font-medium mb-1.5 text-slate-700 dark:text-slate-300" for="water">Drinking Water Source</label>
+                                                <select id="water" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-purple-500 focus:outline-none">
+                                                    <option value="tap">Piped Tap Water (Inside Premises)</option>
+                                                    <option value="handpump">Covered Well / Handpump</option>
+                                                    <option value="tanker">Community Tanker</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                <div class="form-group">
+                                    <label class="block text-sm font-medium mb-1.5 text-slate-700 dark:text-slate-300" for="address" data-i18n="lbl_address">Residential Address</label>
+                                    <textarea id="address" rows="2" required class="w-full bg-white/50 dark:bg-slate-800/50 border border-slate-300 dark:border-slate-600 rounded-xl py-3 px-4 focus:ring-2 focus:ring-brand-emerald transition-all shadow-sm resize-none"></textarea>
+                                </div>
+                            </div>
+                        </form>
+                        
+                        <!-- SE ID Receipt (Hidden initially) -->
+                        <div id="se-id-receipt" class="hidden animate-slide-up flex flex-col items-center justify-center p-8 text-center h-full">
+                            <div class="w-16 h-16 bg-brand-emerald rounded-full flex items-center justify-center mb-4 shadow-lg shadow-brand-emerald/30">
+                                <i data-lucide="check" class="w-8 h-8 text-white"></i>
+                            </div>
+                            <h3 class="text-2xl font-bold mb-2">Enumeration Successful</h3>
+                            <p class="text-slate-500 mb-6 max-w-md">Your data has been locally hashed and securely transmitted. Keep this ID safe.</p>
+                            
+                            <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-inner w-full max-w-sm mb-6 flex flex-col items-center">
+                                <div class="text-xs uppercase tracking-widest text-slate-400 mb-2 font-semibold">Digital SE ID Pass</div>
+                                <div id="receipt-id-text" class="text-xl font-mono font-bold text-brand-indigo mb-4">EG27-XXXXXX</div>
+                                <!-- Mock QR SVG -->
+                                <svg width="120" height="120" viewBox="0 0 100 100" class="mb-2 opacity-90 dark:opacity-80">
+                                    <rect width="100" height="100" fill="#ffffff" rx="10"/>
+                                    <path d="M10 10h20v20H10zM15 15h10v10H15zM70 10h20v20H70zM75 15h10v10H75zM10 70h20v20H10zM15 75h10v10H15zM40 10h20v10H40zM40 30h10v20H40zM60 40h30v10H60zM40 60h20v10H40zM70 70h10v10H70zM85 85h5v5h-5zM40 80h10v10H40zM60 80h10v10H60z" fill="#0f172a"/>
+                                </svg>
+                            </div>
+                            
+                            <button id="btn-print-receipt" class="flex items-center px-6 py-3 bg-slate-800 text-white dark:bg-white dark:text-slate-900 rounded-xl font-medium hover:scale-105 transition-transform shadow-lg">
+                                <i data-lucide="printer" class="w-5 h-5 mr-2"></i> Download Receipt
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="wizard-footer" class="px-8 py-5 border-t border-white/10 bg-slate-50/80 dark:bg-slate-800/80 backdrop-blur-md flex justify-between items-center z-10">
+                        <div class="text-xs text-slate-500 max-w-xs flex items-center">
+                            <i data-lucide="shield" class="w-4 h-4 mr-2 text-brand-emerald flex-shrink-0"></i>
+                            <span data-i18n="legal_disclaimer">Data encrypted locally using C++ WebAssembly module before transit.</span>
+                        </div>
+                        <button id="btn-submit-census" class="relative group overflow-hidden bg-gradient-to-r from-brand-indigo to-brand-emerald text-white px-8 py-3.5 rounded-xl font-bold shadow-lg shadow-brand-indigo/30 hover:shadow-brand-emerald/40 transition-all duration-300 flex items-center transform hover:-translate-y-0.5">
+                            <div class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+                            <span class="relative z-10" data-i18n="btn_generate_id">Generate Digital SE ID</span>
+                            <i data-lucide="arrow-right" class="w-5 h-5 ml-2 relative z-10 group-hover:translate-x-1 transition-transform"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Census Mitra AI Chat Container (5 columns) -->
+                <div class="lg:col-span-5 glass-panel rounded-3xl border border-white/10 shadow-2xl flex flex-col h-full overflow-hidden relative group">
+                    <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-brand-emerald via-teal-500 to-brand-indigo"></div>
+                    
+                    <div class="p-5 border-b border-white/10 bg-white/5 backdrop-blur-md flex items-center justify-between">
+                        <div class="flex items-center">
+                            <div class="relative mr-4 group-hover:scale-105 transition-transform">
+                                <div class="absolute inset-0 bg-gradient-to-br from-brand-indigo to-brand-emerald rounded-full blur opacity-50 animate-pulse"></div>
+                                <div class="relative w-12 h-12 rounded-full bg-gradient-to-br from-brand-indigo to-brand-emerald flex items-center justify-center shadow-inner border-2 border-white/20">
+                                    <i data-lucide="sparkles" class="w-6 h-6 text-white"></i>
+                                </div>
+                                <div class="absolute bottom-0 right-0 w-3.5 h-3.5 bg-green-500 border-2 border-white dark:border-slate-800 rounded-full"></div>
+                            </div>
+                            <div>
+                                <h3 class="font-extrabold text-lg tracking-tight" data-i18n="ai_name">Census Mitra AI</h3>
+                                <span class="text-xs font-medium text-brand-emerald flex items-center">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-brand-emerald mr-1.5 animate-pulse"></span> 
+                                    <span data-i18n="ai_status">Powered by Gemini Multimodal</span>
+                                </span>
+                            </div>
+                        </div>
+                        <button class="text-slate-400 hover:text-white transition-colors" title="Clear Chat">
+                            <i data-lucide="trash-2" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+                    
+                    <div id="chat-messages" class="flex-grow p-5 overflow-y-auto space-y-6 bg-slate-50/40 dark:bg-slate-900/40 custom-scrollbar relative">
+                        <!-- Chat Background Pattern -->
+                        <div class="absolute inset-0 opacity-[0.03] dark:opacity-[0.05] pointer-events-none" style="background-image: url('data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23000000\' fill-opacity=\'1\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');"></div>
+                        
+                        <!-- Initial Bot Message -->
+                        <div class="flex justify-start relative z-10 animate-slide-up">
+                            <div class="w-8 h-8 rounded-full bg-brand-indigo flex items-center justify-center mr-2 flex-shrink-0 mt-auto mb-1">
+                                <i data-lucide="bot" class="w-4 h-4 text-white"></i>
+                            </div>
+                            <div class="bg-white dark:bg-slate-800/90 p-4 rounded-2xl rounded-bl-none shadow-md border border-slate-100 dark:border-slate-700 max-w-[85%] text-sm leading-relaxed backdrop-blur-sm" data-i18n="ai_welcome">
+                                Namaste! I am Census Mitra, your AI guide. I can help you understand questions, debunk myths, or translate terms. How can I assist you with your digital enumeration today?
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="p-4 bg-white/10 dark:bg-slate-800/50 border-t border-white/10 backdrop-blur-md flex flex-col">
+                        <!-- Quick Prompt Chips -->
+                        <div class="flex overflow-x-auto custom-scrollbar space-x-2 pb-2 mb-2 w-full">
+                            <button class="chip-prompt whitespace-nowrap px-3 py-1 bg-brand-indigo/10 hover:bg-brand-indigo/20 text-brand-indigo text-xs font-semibold rounded-full border border-brand-indigo/20 transition-colors">Debunk WhatsApp Link</button>
+                            <button class="chip-prompt whitespace-nowrap px-3 py-1 bg-brand-emerald/10 hover:bg-brand-emerald/20 text-brand-emerald text-xs font-semibold rounded-full border border-brand-emerald/20 transition-colors">Explain Houselisting Code</button>
+                            <button class="chip-prompt whitespace-nowrap px-3 py-1 bg-purple-500/10 hover:bg-purple-500/20 text-purple-600 dark:text-purple-400 text-xs font-semibold rounded-full border border-purple-500/20 transition-colors">Test Voice Input</button>
+                        </div>
+                        
+                        <div class="flex items-end space-x-2 relative bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-inner p-1 focus-within:ring-2 focus-within:ring-brand-indigo focus-within:border-transparent transition-all">
+                            
+                            <button class="p-2.5 text-slate-400 hover:text-brand-indigo hover:bg-brand-indigo/10 rounded-xl transition-colors mb-1" aria-label="Upload Document" title="Simulate Image/Document Upload">
+                                <i data-lucide="paperclip" class="w-5 h-5"></i>
+                            </button>
+                            
+                            <textarea id="chat-input" rows="1" class="w-full bg-transparent border-none py-3 px-2 text-sm focus:ring-0 resize-none max-h-32 custom-scrollbar placeholder-slate-400" placeholder="Ask Census Mitra..." data-i18n-placeholder="ai_placeholder"></textarea>
+                            
+                            <div class="flex items-center mb-1 pr-1">
+                                <button id="btn-voice" class="p-2.5 text-slate-400 hover:text-brand-emerald hover:bg-brand-emerald/10 rounded-xl transition-colors mr-1 relative group/mic" aria-label="Voice Input">
+                                    <i data-lucide="mic" class="w-5 h-5 relative z-10"></i>
+                                    <div class="absolute inset-0 bg-brand-emerald/20 rounded-xl scale-0 group-hover/mic:scale-100 group-hover/mic:animate-ping transition-transform"></div>
+                                </button>
+                                
+                                <button id="btn-send-chat" class="p-2.5 bg-brand-indigo text-white rounded-xl hover:bg-brand-indigo/90 shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all" aria-label="Send Message">
+                                    <i data-lucide="send" class="w-5 h-5"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== ADMIN PORTAL ==================== -->
+        <section id="view-admin" class="w-full max-w-[90rem] animate-slide-up hidden">
+            <!-- Admin Header -->
+            <div class="glass-panel px-8 py-5 rounded-3xl border border-white/10 shadow-xl mb-8 flex flex-col md:flex-row justify-between items-start md:items-center relative overflow-hidden">
+                <div class="absolute inset-0 bg-gradient-to-r from-brand-emerald/5 via-transparent to-brand-indigo/5 pointer-events-none"></div>
+                <div class="relative z-10 mb-4 md:mb-0">
+                    <h2 class="text-3xl font-extrabold flex items-center tracking-tight">
+                        <div class="bg-brand-emerald p-2 rounded-xl mr-3 shadow-lg shadow-brand-emerald/30">
+                            <i data-lucide="layout-dashboard" class="w-7 h-7 text-white"></i>
+                        </div>
+                        <span data-i18n="admin_title">Command Center</span>
+                    </h2>
+                    <p class="text-sm text-slate-500 mt-1 flex items-center" data-i18n="admin_sub">
+                        <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse mr-2"></span>
+                        Real-time synchronization via secure Firestore channels
+                    </p>
+                </div>
+                <div class="flex items-center space-x-4 relative z-10">
+                    <div class="bg-white/10 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 px-4 py-2 rounded-xl text-sm font-semibold flex items-center shadow-inner">
+                        <i data-lucide="clock" class="w-4 h-4 mr-2 text-brand-indigo"></i>
+                        <span id="live-clock">12:00:00</span>
+                    </div>
+                    <button class="btn-logout bg-rose-500/10 text-rose-600 dark:text-rose-400 hover:bg-rose-500 hover:text-white px-5 py-2.5 rounded-xl font-medium transition-colors flex items-center border border-rose-500/20 shadow-sm" data-i18n="btn_exit">
+                        <i data-lucide="log-out" class="w-4 h-4 mr-2"></i> Exit
+                    </button>
+                </div>
+            </div>
+
+            <!-- Top KPIs -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <!-- KPI 1 -->
+                <div class="glass-panel p-6 rounded-3xl border border-white/5 relative overflow-hidden group hover:-translate-y-1 transition-transform duration-300 shadow-lg">
+                    <div class="absolute -right-6 -top-6 bg-brand-indigo/10 w-24 h-24 rounded-full blur-2xl group-hover:bg-brand-indigo/20 transition-colors"></div>
+                    <div class="flex justify-between items-start mb-4 relative z-10">
+                        <div>
+                            <h3 class="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider" data-i18n="kpi_total">Total Enumerated</h3>
+                            <div class="text-4xl font-extrabold text-slate-800 dark:text-white mt-1 counter" data-target="3450432">0</div>
+                        </div>
+                        <div class="p-3 bg-brand-indigo/10 rounded-xl text-brand-indigo">
+                            <i data-lucide="users" class="w-6 h-6"></i>
+                        </div>
+                    </div>
+                    <div class="text-sm font-medium text-emerald-500 flex items-center relative z-10">
+                        <i data-lucide="trending-up" class="w-4 h-4 mr-1"></i> +12.5% <span class="text-slate-400 ml-1 font-normal text-xs" data-i18n="kpi_today">today</span>
+                    </div>
+                </div>
+
+                <!-- KPI 2 -->
+                <div class="glass-panel p-6 rounded-3xl border border-white/5 relative overflow-hidden group hover:-translate-y-1 transition-transform duration-300 shadow-lg">
+                    <div class="absolute -right-6 -top-6 bg-brand-emerald/10 w-24 h-24 rounded-full blur-2xl group-hover:bg-brand-emerald/20 transition-colors"></div>
+                    <div class="flex justify-between items-start mb-4 relative z-10">
+                        <div>
+                            <h3 class="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider" data-i18n="kpi_verify">Verification Rate</h3>
+                            <div class="text-4xl font-extrabold text-slate-800 dark:text-white mt-1"><span class="counter" data-target="98.4">0</span>%</div>
+                        </div>
+                        <div class="p-3 bg-brand-emerald/10 rounded-xl text-brand-emerald">
+                            <i data-lucide="shield-check" class="w-6 h-6"></i>
+                        </div>
+                    </div>
+                    <!-- Mini progress bar -->
+                    <div class="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-1.5 mt-3 relative z-10 overflow-hidden">
+                        <div class="bg-brand-emerald h-1.5 rounded-full" style="width: 98.4%"></div>
+                    </div>
+                </div>
+
+                <!-- KPI 3 -->
+                <div class="glass-panel p-6 rounded-3xl border border-white/5 relative overflow-hidden group hover:-translate-y-1 transition-transform duration-300 shadow-lg">
+                    <div class="absolute -right-6 -top-6 bg-orange-500/10 w-24 h-24 rounded-full blur-2xl group-hover:bg-orange-500/20 transition-colors"></div>
+                    <div class="flex justify-between items-start mb-4 relative z-10">
+                        <div>
+                            <h3 class="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider" data-i18n="kpi_pending">Pending Sync (Edge)</h3>
+                            <div class="text-4xl font-extrabold text-slate-800 dark:text-white mt-1 counter" data-target="1432">0</div>
+                        </div>
+                        <div class="p-3 bg-orange-500/10 rounded-xl text-orange-500">
+                            <i data-lucide="wifi-off" class="w-6 h-6"></i>
+                        </div>
+                    </div>
+                    <div class="text-sm font-medium text-orange-500 flex items-center relative z-10">
+                        <i data-lucide="loader" class="w-4 h-4 mr-1 animate-spin"></i> <span data-i18n="kpi_syncing">Syncing via Service Worker...</span>
+                    </div>
+                </div>
+
+                <!-- KPI 4 -->
+                <div class="glass-panel p-6 rounded-3xl border border-white/5 relative overflow-hidden group hover:-translate-y-1 transition-transform duration-300 shadow-lg">
+                    <div class="absolute -right-6 -top-6 bg-purple-500/10 w-24 h-24 rounded-full blur-2xl group-hover:bg-purple-500/20 transition-colors"></div>
+                    <div class="flex justify-between items-start mb-4 relative z-10">
+                        <div>
+                            <h3 class="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider" data-i18n="kpi_ai">AI Queries Served</h3>
+                            <div class="text-4xl font-extrabold text-slate-800 dark:text-white mt-1 counter" data-target="89204">0</div>
+                        </div>
+                        <div class="p-3 bg-purple-500/10 rounded-xl text-purple-500">
+                            <i data-lucide="sparkles" class="w-6 h-6"></i>
+                        </div>
+                    </div>
+                    <div class="text-sm font-medium text-purple-500 flex items-center relative z-10">
+                        <i data-lucide="bot" class="w-4 h-4 mr-1"></i> <span data-i18n="kpi_gemini">Powered by Gemini</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Standalone Prominent Hero Search Container -->
+            <div class="glass-panel p-8 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm mb-8 animate-slide-up relative overflow-hidden">
+                <div class="max-w-3xl mx-auto text-center">
+                    <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-brand-indigo/10 text-brand-indigo text-xs font-bold mb-3">
+                        <i data-lucide="map-pin" class="w-3.5 h-3.5"></i>
+                        <span>36 States & Union Territories Census Directory</span>
+                    </div>
+                    <h2 class="text-3xl font-extrabold text-slate-800 dark:text-white tracking-tight mb-2">Search Census Data Across India</h2>
+                    <p class="text-xs text-slate-500 mb-6">Type any State, Union Territory, or District (e.g. Maharashtra, Delhi, Chennai, Pune) to view live household statistics and survey dates.</p>
+                    
+                    <div class="relative max-w-2xl mx-auto">
+                        <div class="relative flex items-center">
+                            <i data-lucide="search" class="w-5 h-5 text-slate-400 absolute left-4 pointer-events-none"></i>
+                            <input type="text" id="hero-search-input" placeholder="Search State, UT, or District..." class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-sm font-medium rounded-2xl py-4 pl-12 pr-6 shadow-lg focus:outline-none focus:ring-2 focus:ring-brand-indigo transition-all">
+                        </div>
+                        <!-- Hero Search Dropdown -->
+                        <div id="hero-search-dropdown" class="hidden absolute top-full left-0 w-full mt-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-2xl overflow-hidden max-h-80 overflow-y-auto custom-scrollbar z-50 text-left">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cybersecurity Threat Elimination & Defense Board -->
+            <div class="glass-panel p-8 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm mb-8 animate-slide-up bg-gradient-to-r from-slate-900 via-slate-900 to-indigo-950 text-white">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+                    <div>
+                        <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 text-xs font-bold mb-2 border border-emerald-500/30">
+                            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                            <span>Live Cyber Threat Defense Telemetry</span>
+                        </div>
+                        <h3 class="text-2xl font-bold text-white flex items-center">
+                            <i data-lucide="shield-alert" class="w-6 h-6 mr-3 text-emerald-400"></i>
+                            Cybersecurity Threat Elimination Board
+                        </h3>
+                    </div>
+                    <div class="text-xs text-slate-400 mt-2 md:mt-0 font-mono">
+                        Protected by WASM C++ Edge & Cloud WAF
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6 text-center">
+                    <div class="p-4 rounded-2xl bg-white/5 border border-white/10">
+                        <div class="text-[10px] uppercase font-bold text-slate-400">Total Threats Eliminated</div>
+                        <div class="text-2xl font-extrabold text-emerald-400 mt-1 counter" data-target="48291">48,291</div>
+                    </div>
+                    <div class="p-4 rounded-2xl bg-white/5 border border-white/10">
+                        <div class="text-[10px] uppercase font-bold text-slate-400">Fake Links / WhatsApp Blocked</div>
+                        <div class="text-2xl font-extrabold text-brand-indigo mt-1 counter" data-target="18405">18,405</div>
+                    </div>
+                    <div class="p-4 rounded-2xl bg-white/5 border border-white/10">
+                        <div class="text-[10px] uppercase font-bold text-slate-400">Financial Fraud Blocked</div>
+                        <div class="text-2xl font-extrabold text-amber-400 mt-1 counter" data-target="12310">12,310</div>
+                    </div>
+                    <div class="p-4 rounded-2xl bg-white/5 border border-white/10">
+                        <div class="text-[10px] uppercase font-bold text-slate-400">Malicious APKs Stopped</div>
+                        <div class="text-2xl font-extrabold text-purple-400 mt-1 counter" data-target="9522">9,522</div>
+                    </div>
+                    <div class="p-4 rounded-2xl bg-white/5 border border-white/10 col-span-2 md:col-span-1">
+                        <div class="text-[10px] uppercase font-bold text-slate-400">SQLi & XSS Blocks</div>
+                        <div class="text-2xl font-extrabold text-rose-400 mt-1 counter" data-target="8054">8,054</div>
+                    </div>
+                </div>
+
+                <!-- Recent Blocked Attacks Ticker -->
+                <div class="bg-black/40 rounded-xl p-3 border border-white/10 flex items-center space-x-3 text-xs font-mono">
+                    <span class="px-2 py-0.5 rounded bg-rose-500/20 text-rose-400 font-bold text-[10px] uppercase flex-shrink-0">Live Intercept</span>
+                    <div id="security-attack-log" class="text-slate-300 truncate">
+                        [13:56:02] Intercepted fake SMS phishing domain census2027-verify.org -> Blacklisted by Edge WAF.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bento-Grid Analytical Metric Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 animate-slide-up">
+                <!-- Card 1: Population Hotspots -->
+                <div class="glass-panel glass-panel-hover p-6 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm relative overflow-hidden">
+                    <div class="flex justify-between items-start mb-3">
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Population Hotspot</span>
+                        <div class="p-2 bg-brand-indigo/10 text-brand-indigo rounded-xl"><i data-lucide="trending-up" class="w-5 h-5"></i></div>
+                    </div>
+                    <div class="text-2xl font-extrabold text-slate-800 dark:text-white">Maharashtra</div>
+                    <div class="text-xs font-medium text-emerald-500 mt-1">126.4 Million Total Pop • +1.4% YoY</div>
+                    <div class="w-full bg-slate-100 dark:bg-slate-800 h-1.5 rounded-full mt-4 overflow-hidden">
+                        <div class="bg-brand-indigo h-full rounded-full" style="width: 78%"></div>
+                    </div>
+                </div>
+
+                <!-- Card 2: Employment & Labor Force -->
+                <div class="glass-panel glass-panel-hover p-6 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm relative overflow-hidden">
+                    <div class="flex justify-between items-start mb-3">
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Labor Force Split</span>
+                        <div class="p-2 bg-emerald-500/10 text-emerald-500 rounded-xl"><i data-lucide="briefcase" class="w-5 h-5"></i></div>
+                    </div>
+                    <div class="text-2xl font-extrabold text-slate-800 dark:text-white">48.2% Salaried</div>
+                    <div class="text-xs font-medium text-slate-500 mt-1">31% Agri • 20.8% Self-Employed</div>
+                    <div class="w-full bg-slate-100 dark:bg-slate-800 h-1.5 rounded-full mt-4 overflow-hidden">
+                        <div class="bg-emerald-500 h-full rounded-full" style="width: 65%"></div>
+                    </div>
+                </div>
+
+                <!-- Card 3: Educational Attainment -->
+                <div class="glass-panel glass-panel-hover p-6 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm relative overflow-hidden">
+                    <div class="flex justify-between items-start mb-3">
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Literacy Index</span>
+                        <div class="p-2 bg-purple-500/10 text-purple-500 rounded-xl"><i data-lucide="graduation-cap" class="w-5 h-5"></i></div>
+                    </div>
+                    <div class="text-2xl font-extrabold text-slate-800 dark:text-white">84.6% Literate</div>
+                    <div class="text-xs font-medium text-purple-500 mt-1">Higher Sec & Above: 42.1%</div>
+                    <div class="w-full bg-slate-100 dark:bg-slate-800 h-1.5 rounded-full mt-4 overflow-hidden">
+                        <div class="bg-purple-500 h-full rounded-full" style="width: 84%"></div>
+                    </div>
+                </div>
+
+                <!-- Card 4: Digital Self-Enumeration -->
+                <div class="glass-panel glass-panel-hover p-6 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm relative overflow-hidden">
+                    <div class="flex justify-between items-start mb-3">
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Digital SE Adoption</span>
+                        <div class="p-2 bg-amber-500/10 text-amber-500 rounded-xl"><i data-lucide="smartphone" class="w-5 h-5"></i></div>
+                    </div>
+                    <div class="text-2xl font-extrabold text-slate-800 dark:text-white">74.8% Online</div>
+                    <div class="text-xs font-medium text-amber-500 mt-1">25.2% Field Enumerator Sync</div>
+                    <div class="w-full bg-slate-100 dark:bg-slate-800 h-1.5 rounded-full mt-4 overflow-hidden">
+                        <div class="bg-amber-500 h-full rounded-full" style="width: 74%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Interactive Vector SVG India Map Module -->
+            <div class="glass-panel p-8 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm mb-8 animate-slide-up">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+                    <div>
+                        <h3 class="text-2xl font-bold flex items-center text-slate-800 dark:text-white">
+                            <i data-lucide="map" class="w-6 h-6 mr-3 text-brand-indigo"></i>
+                            Interactive India Geographical Survey Map
+                        </h3>
+                        <p class="text-xs text-slate-500 mt-1">Click any state region on the map to trigger district-level count drill-downs</p>
+                    </div>
+                    <div class="flex items-center space-x-3 text-xs mt-3 md:mt-0">
+                        <span class="flex items-center"><span class="w-3 h-3 rounded-full bg-brand-indigo mr-1"></span> High Adoption (>80%)</span>
+                        <span class="flex items-center"><span class="w-3 h-3 rounded-full bg-brand-emerald mr-1"></span> Moderate (60-80%)</span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                    <!-- SVG India Vector Representation -->
+                    <div class="lg:col-span-7 flex justify-center p-4 bg-slate-50 dark:bg-slate-800/40 rounded-2xl border border-slate-200/60 dark:border-slate-700">
+                        <svg id="svg-india-map" viewBox="0 0 500 550" class="w-full max-w-md h-auto drop-shadow-md">
+                            <!-- Northern Region -->
+                            <path d="M210 40 L260 20 L290 60 L270 100 L210 90 Z" fill="#4F46E5" fill-opacity="0.85" stroke="#ffffff" stroke-width="2" class="map-region" data-state="Delhi"/>
+                            <path d="M150 90 L210 90 L270 100 L240 160 L140 140 Z" fill="#10B981" fill-opacity="0.85" stroke="#ffffff" stroke-width="2" class="map-region" data-state="Uttar Pradesh"/>
+                            <!-- Western Region -->
+                            <path d="M80 160 L140 140 L180 230 L110 260 L60 200 Z" fill="#4F46E5" fill-opacity="0.85" stroke="#ffffff" stroke-width="2" class="map-region" data-state="Gujarat"/>
+                            <path d="M110 260 L180 230 L260 270 L210 370 L120 340 Z" fill="#10B981" fill-opacity="0.85" stroke="#ffffff" stroke-width="2" class="map-region" data-state="Maharashtra"/>
+                            <!-- Southern Region -->
+                            <path d="M120 340 L210 370 L230 460 L160 480 L130 400 Z" fill="#4F46E5" fill-opacity="0.85" stroke="#ffffff" stroke-width="2" class="map-region" data-state="Karnataka"/>
+                            <path d="M210 370 L280 350 L290 470 L230 460 Z" fill="#10B981" fill-opacity="0.85" stroke="#ffffff" stroke-width="2" class="map-region" data-state="Tamil Nadu"/>
+                            <path d="M160 480 L230 460 L210 520 L170 510 Z" fill="#4F46E5" fill-opacity="0.85" stroke="#ffffff" stroke-width="2" class="map-region" data-state="Kerala"/>
+                            <!-- Eastern Region -->
+                            <path d="M270 100 L370 110 L350 220 L260 270 L240 160 Z" fill="#10B981" fill-opacity="0.85" stroke="#ffffff" stroke-width="2" class="map-region" data-state="West Bengal"/>
+                        </svg>
+                    </div>
+
+                    <!-- Map Side Stats Overview -->
+                    <div class="lg:col-span-5 space-y-4">
+                        <div class="p-4 rounded-2xl bg-white/60 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
+                            <div class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Interactive Map Quick Tip</div>
+                            <p class="text-xs text-slate-600 dark:text-slate-300">Click any highlighted polygon region on the map (e.g. Maharashtra, Delhi, Tamil Nadu, Kerala) to open its district-wise census analytics.</p>
+                        </div>
+                        <div id="map-hover-details" class="p-5 rounded-2xl bg-brand-indigo/5 border border-brand-indigo/20 flex flex-col justify-center">
+                            <div class="text-xs font-bold text-brand-indigo uppercase tracking-wider mb-1">Selected Region</div>
+                            <div id="map-selected-title" class="text-xl font-extrabold text-slate-800 dark:text-white">Click a State / UT</div>
+                            <div id="map-selected-sub" class="text-xs text-slate-500 mt-1">Hover over map or use search bar to drill down into 36 States/UTs.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts & Tables Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                
+                <!-- Main Chart (2 cols) -->
+                <div class="lg:col-span-2 glass-panel p-6 rounded-3xl border border-white/10 shadow-xl flex flex-col">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-xl font-bold" data-i18n="chart_title_1">Enrollment Trajectory (Last 7 Days)</h3>
+                        <div class="flex space-x-2">
+                            <button class="px-3 py-1 bg-white/10 rounded-md text-xs font-semibold hover:bg-brand-indigo hover:text-white transition-colors">1W</button>
+                            <button class="px-3 py-1 bg-white/10 rounded-md text-xs font-semibold hover:bg-brand-indigo hover:text-white transition-colors">1M</button>
+                            <button class="px-3 py-1 bg-white/10 rounded-md text-xs font-semibold hover:bg-brand-indigo hover:text-white transition-colors">1Y</button>
+                        </div>
+                    </div>
+                    <div class="flex-grow w-full relative min-h-[350px]">
+                        <canvas id="mainChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Secondary Chart (1 col) -->
+                <div class="glass-panel p-6 rounded-3xl border border-white/10 shadow-xl flex flex-col">
+                    <h3 class="text-xl font-bold mb-6" data-i18n="chart_title_2">Demographic Age Distribution</h3>
+                    <div class="flex-grow w-full relative flex items-center justify-center min-h-[300px]">
+                        <canvas id="doughnutChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Live Data Table (2 cols) -->
+                <div class="lg:col-span-2 glass-panel p-6 rounded-3xl border border-white/10 shadow-xl">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-xl font-bold" data-i18n="table_title">Recent Secure Ingestions</h3>
+                        <div class="relative">
+                            <i data-lucide="search" class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400"></i>
+                            <input type="text" class="bg-white/5 border border-slate-300/50 dark:border-slate-700/50 rounded-lg pl-9 pr-4 py-1.5 text-sm focus:ring-2 focus:ring-brand-indigo focus:outline-none" placeholder="Search hash..." data-i18n-placeholder="table_search">
+                        </div>
+                    </div>
+                    
+                    <div class="overflow-x-auto custom-scrollbar">
+                        <table class="w-full text-sm text-left">
+                            <thead class="text-xs text-slate-500 uppercase bg-slate-100/50 dark:bg-slate-800/50 rounded-lg">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 rounded-tl-lg" data-i18n="th_id">Edge Hash ID</th>
+                                    <th scope="col" class="px-6 py-3" data-i18n="th_size">HH Size</th>
+                                    <th scope="col" class="px-6 py-3" data-i18n="th_region">Region (Simulated)</th>
+                                    <th scope="col" class="px-6 py-3" data-i18n="th_status">Status</th>
+                                    <th scope="col" class="px-6 py-3 rounded-tr-lg" data-i18n="th_time">Timestamp</th>
+                                </tr>
+                            </thead>
+                            <tbody id="mock-table-body" class="divide-y divide-slate-200/50 dark:divide-slate-700/50">
+                                <!-- Generated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="mt-4 flex justify-between items-center text-xs text-slate-500">
+                        <span data-i18n="table_showing">Showing top 5 recent entries</span>
+                        <div class="flex space-x-1">
+                            <button class="p-1 border border-slate-300 dark:border-slate-700 rounded hover:bg-slate-200 dark:hover:bg-slate-700"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
+                            <button class="p-1 border border-slate-300 dark:border-slate-700 rounded hover:bg-slate-200 dark:hover:bg-slate-700"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Live Feed (1 col) -->
+                <div class="glass-panel p-0 rounded-3xl border border-white/10 shadow-xl overflow-hidden flex flex-col h-[450px]">
+                    <div class="p-6 border-b border-white/10 bg-white/5 backdrop-blur-md">
+                        <h3 class="text-xl font-bold flex items-center" data-i18n="feed_title">
+                            <div class="w-2 h-2 rounded-full bg-rose-500 animate-pulse mr-2"></div>
+                            Live Agent Activity
+                        </h3>
+                    </div>
+                    <div id="activity-feed" class="flex-grow overflow-y-auto p-4 space-y-3 custom-scrollbar bg-slate-50/30 dark:bg-slate-900/30 relative">
+                        <!-- Items injected by JS -->
+                    </div>
+                </div>
+                
+            </div>
+        </section>
+
+        <!-- ==================== STATE SURVEY SCHEDULES SECTION ==================== -->
+        <section id="section-schedules" class="w-full max-w-7xl mt-12 animate-slide-up">
+            <div class="glass-panel p-8 rounded-3xl border border-white/10 shadow-2xl">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+                    <div>
+                        <h2 class="text-2xl font-bold flex items-center text-brand-indigo">
+                            <i data-lucide="calendar" class="w-6 h-6 mr-3 text-brand-indigo"></i>
+                            2027 Census State & UT Roadmap Schedules
+                        </h2>
+                        <p class="text-xs text-slate-500 mt-1">Phased timelines for Phase 1 Houselisting and Phase 2 Population Enumeration</p>
+                    </div>
+                    <div class="flex space-x-2 mt-4 md:mt-0">
+                        <button class="schedule-zone-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-brand-indigo text-white shadow-sm" data-zone="all">All Zones</button>
+                        <button class="schedule-zone-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/10 text-slate-400 hover:bg-white/20 transition-all" data-zone="North">North Zone</button>
+                        <button class="schedule-zone-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/10 text-slate-400 hover:bg-white/20 transition-all" data-zone="South">South Zone</button>
+                        <button class="schedule-zone-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/10 text-slate-400 hover:bg-white/20 transition-all" data-zone="West">West Zone</button>
+                    </div>
+                </div>
+
+                <div id="schedule-grid" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <!-- Schedule cards injected by JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== TRUST & PRIVACY SHIELD ==================== -->
+        <section class="w-full max-w-7xl mt-8 mb-12 animate-slide-up">
+            <div class="glass-panel p-8 rounded-3xl border border-emerald-500/20 shadow-2xl bg-gradient-to-r from-emerald-500/5 via-transparent to-brand-indigo/5">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-center">
+                    <div>
+                        <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-500 text-xs font-bold mb-3 border border-emerald-500/20">
+                            <i data-lucide="shield-check" class="w-4 h-4"></i>
+                            <span>Zero Trust Security Architecture</span>
+                        </div>
+                        <h2 class="text-2xl font-bold tracking-tight">Trust & Privacy Shield</h2>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-2 leading-relaxed">
+                            Your census data is protected by client-side WebAssembly C++ cryptography. Sensitive identity markers (Aadhaar, DOB) are salted and hashed locally on your device before transmission.
+                        </p>
+                    </div>
+                    <div class="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                        <div class="p-4 rounded-2xl bg-white/40 dark:bg-slate-800/40 border border-white/10">
+                            <div class="font-bold text-emerald-500 flex items-center mb-1">
+                                <i data-lucide="check-circle" class="w-4 h-4 mr-1.5"></i> Never Asks for Bank OTPs or PINs
+                            </div>
+                            <p class="text-slate-500 dark:text-slate-400 text-[11px]">Census 2027 will NEVER request financial credentials, banking passwords, or OTP verification.</p>
+                        </div>
+                        <div class="p-4 rounded-2xl bg-white/40 dark:bg-slate-800/40 border border-white/10">
+                            <div class="font-bold text-brand-indigo flex items-center mb-1">
+                                <i data-lucide="lock" class="w-4 h-4 mr-1.5"></i> Local WASM C++ Edge Encryption
+                            </div>
+                            <p class="text-slate-500 dark:text-slate-400 text-[11px]">All PII data is SHA-256 encrypted directly inside your browser sandbox using C++ Wasm modules.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Developer / Judge Demo Panel -->
+    <div class="fixed bottom-4 left-4 z-50 animate-slide-up" style="animation-delay: 0.5s;">
+        <div class="glass-panel p-4 rounded-2xl border border-white/20 shadow-2xl flex flex-col items-center">
+            <div class="text-[10px] uppercase font-bold tracking-widest text-slate-500 mb-2">Developer Panel</div>
+            <button id="btn-demo-autofill" class="px-4 py-2 bg-gradient-to-r from-orange-500 to-amber-500 text-white text-xs font-bold rounded-xl shadow-lg hover:shadow-orange-500/30 hover:scale-105 transition-all flex items-center">
+                <i data-lucide="zap" class="w-4 h-4 mr-1"></i> Auto-Fill Citizen Form
+            </button>
+        </div>
+    </div>
+
+    <!-- Drill-Down Modal for 36 States/UTs -->
+    <div id="drilldown-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-md p-4 animate-slide-up">
+        <div class="glass-panel w-full max-w-3xl rounded-3xl border border-white/20 shadow-2xl p-6 relative max-h-[90vh] overflow-y-auto custom-scrollbar">
+            <button id="close-drilldown-modal" class="absolute top-4 right-4 p-2 rounded-full hover:bg-white/10 text-slate-400 hover:text-white transition-colors">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+            <div id="modal-content">
+                <!-- Injected dynamically by JS -->
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/app.js"></script>
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>
